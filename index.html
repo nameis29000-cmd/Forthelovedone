@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1c1733">
+<title>forthelovedone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #1c1733;
+    --dusk: #2a2250;
+    --haze: #3b3270;
+    --rose: #ffb4c8;
+    --rose-ink: #3a1230;
+    --text: #f3effc;
+    --muted: #a79fc9;
+    --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--night); color: var(--text); font: 400 16px/1.45 var(--body); }
+  [hidden] { display: none !important; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+
+  /* ---------- join screen ---------- */
+  #join {
+    min-height: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .brand {
+    margin: 0 0 14px;
+    font: 800 clamp(2.2rem, 10.5vw, 3.4rem)/1 var(--display);
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+  }
+  .tagline { margin: 0 0 32px; font-size: 1.1rem; color: var(--muted); max-width: 30ch; }
+  #joinForm label { display: block; margin-bottom: 8px; font-weight: 600; }
+  #nick {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 2px solid var(--haze);
+    background: var(--dusk);
+    font-size: 1.1rem;
+  }
+  #nick:focus-visible { border-color: var(--rose); outline: none; }
+  .go {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--rose);
+    color: var(--rose-ink);
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+  .fine { margin: 24px 0 0; font-size: .9rem; color: var(--muted); }
+
+  /* ---------- chat ---------- */
+  #chat {
+    height: 100dvh;
+    max-width: 760px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto;
+    background: var(--night);
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+    background: var(--dusk);
+  }
+  .top .brand-sm { font: 800 1.15rem/1 var(--display); letter-spacing: -0.02em; }
+  .invite {
+    padding: 8px 14px;
+    border: 2px solid var(--rose);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--rose);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .who-here {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--dusk);
+    border-top: 1px solid var(--haze);
+    font-size: .9rem;
+    color: var(--muted);
+  }
+  #people { display: flex; padding-left: 6px; }
+  .dot {
+    width: 28px;
+    height: 28px;
+    margin-left: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--dusk);
+    display: grid;
+    place-items: center;
+    font: 800 .8rem/1 var(--display);
+    color: #1c1733;
+  }
+  .more { margin-left: 6px; align-self: center; }
+  #status { margin-left: auto; color: var(--rose); }
+  .notice { margin: 0; padding: 8px 14px; font-size: .8rem; color: var(--muted); }
+
+  #log {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 8px 14px 12px;
+  }
+  .row { display: flex; flex-direction: column; max-width: 82%; margin: 6px 0; }
+  .row.mine { align-self: flex-end; align-items: flex-end; }
+  .row.theirs { align-self: flex-start; align-items: flex-start; }
+  .who { display: flex; gap: 10px; align-items: baseline; margin: 0 6px 3px; font-size: .8rem; }
+  .name { font-weight: 600; }
+  .mute {
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-size: .75rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .bubble { padding: 9px 14px; border-radius: 18px; overflow-wrap: anywhere; }
+  .mine .bubble { background: var(--rose); color: var(--rose-ink); border-bottom-right-radius: 6px; }
+  .theirs .bubble { background: var(--haze); border-bottom-left-radius: 6px; }
+  .time { margin: 3px 6px 0; font-size: .7rem; color: var(--muted); }
+  .sys { align-self: center; margin: 8px 0; text-align: center; font-size: .8rem; color: var(--muted); }
+  .hint { max-width: 28ch; margin-top: 24px; font-size: .95rem; }
+
+  #composer {
+    display: flex;
+    gap: 10px;
+    padding: 10px 14px max(10px, env(safe-area-inset-bottom));
+    background: var(--dusk);
+  }
+  #msg {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
+    border: 2px solid var(--haze);
+    border-radius: 999px;
+    background: var(--night);
+    font-size: 16px; /* stops iOS from zooming in */
+  }
+  #msg:focus-visible { border-color: var(--rose); outline: none; }
+  .send {
+    padding: 0 20px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--rose);
+    color: var(--rose-ink);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    max-width: 90vw;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--night);
+    font-size: .9rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<main id="join">
+  <h1 class="brand">forthelovedone</h1>
+  <p class="tagline">A private room for you and your people. Pick a nickname, share the link, and talk.</p>
+  <form id="joinForm" autocomplete="off">
+    <label for="nick">Your nickname</label>
+    <input id="nick" maxlength="20" required>
+    <button class="go" type="submit">Join the room</button>
+  </form>
+  <p class="fine">No signup. Messages disappear after 24 hours. Don't share personal details like your address, school, or phone number.</p>
+</main>
+
+<section id="chat" hidden>
+  <header class="top">
+    <span class="brand-sm">forthelovedone</span>
+    <button class="invite" id="invite" type="button">Invite friends</button>
+  </header>
+  <div class="who-here">
+    <div id="people"></div>
+    <span id="count"></span>
+    <span id="status" hidden>Reconnecting...</span>
+  </div>
+  <p class="notice">Anyone with this link can join and read. Only share it with people you trust.</p>
+  <div id="log" aria-live="polite"></div>
+  <form id="composer" autocomplete="off">
+    <input id="msg" maxlength="500" placeholder="Say something" enterkeyhint="send" aria-label="Message">
+    <button class="send" type="submit">Send</button>
+  </form>
+</section>
+
+<div id="toast" role="status" hidden></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(function () {
+  var roomId = location.pathname.split('/')[2] || '';
+  var $ = function (s) { return document.querySelector(s); };
+
+  var joinScreen = $('#join'), chat = $('#chat'), nick = $('#nick');
+  var log = $('#log'), msgInput = $('#msg'), peopleBox = $('#people');
+  var count = $('#count'), statusEl = $('#status'), toastEl = $('#toast');
+
+  var socket = null, myName = '', myId = '', joined = false, toastTimer = null;
+  var muted = new Set();
+
+  var ADJ = ['Blue', 'Sunny', 'Quiet', 'Lucky', 'Cosmic', 'Mellow', 'Brave', 'Cozy', 'Swift', 'Golden'];
+  var ANI = ['Fox', 'Otter', 'Panda', 'Owl', 'Koala', 'Finch', 'Lynx', 'Whale', 'Gecko', 'Moth'];
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function randomName() { return pick(ADJ) + pick(ANI); }
+
+  function store(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      localStorage.setItem(key, value);
+    } catch (e) { return null; }
+  }
+
+  // A private id for this browser, so your own messages stay "yours" after a reconnect.
+  var cid = store('ftlo-cid');
+  if (!cid) {
+    cid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+      : String(Math.random()).slice(2) + String(Date.now());
+    store('ftlo-cid', cid);
+  }
+
+  nick.value = store('ftlo-name') || randomName();
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function color(name) {
+    var h = 0;
+    for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 360;
+    return 'hsl(' + h + ' 70% 75%)';
+  }
+
+  function toast(text) {
+    toastEl.textContent = text;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2600);
+  }
+
+  function nearBottom() { return log.scrollHeight - log.scrollTop - log.clientHeight < 120; }
+  function scrollDown() { log.scrollTop = log.scrollHeight; }
+
+  function clock(ts) {
+    return new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function clearHints() {
+    log.querySelectorAll('.hint').forEach(function (n) { n.remove(); });
+  }
+
+  function addSystem(text, cls) {
+    var stick = nearBottom();
+    log.append(el('div', 'sys ' + (cls || ''), text));
+    if (stick) scrollDown();
+  }
+
+  function addMessage(m) {
+    var mine = m.from === myId;
+    if (!mine && muted.has(m.name)) return;
+    clearHints();
+    var stick = nearBottom();
+
+    var row = el('div', 'row ' + (mine ? 'mine' : 'theirs'));
+    row.dataset.name = m.name;
+
+    if (!mine) {
+      var who = el('div', 'who');
+      var n = el('span', 'name', m.name);
+      n.style.color = color(m.name);
+      var mute = el('button', 'mute', 'Mute');
+      mute.type = 'button';
+      mute.addEventListener('click', function () { muteName(m.name); });
+      who.append(n, mute);
+      row.append(who);
+    }
+    row.append(el('div', 'bubble', m.text), el('time', 'time', clock(m.ts)));
+    log.append(row);
+    if (mine || stick) scrollDown();
+  }
+
+  function muteName(name) {
+    muted.add(name);
+    log.querySelectorAll('.row.theirs').forEach(function (r) {
+      if (r.dataset.name === name) r.remove();
+    });
+    toast('Muted ' + name + '. Reload the page to unmute.');
+  }
+
+  function renderPeople(list) {
+    peopleBox.textContent = '';
+    list.slice(0, 6).forEach(function (p) {
+      var d = el('span', 'dot', (Array.from(p.name)[0] || '?').toUpperCase());
+      d.style.background = color(p.name);
+      d.title = p.name;
+      peopleBox.append(d);
+    });
+    if (list.length > 6) peopleBox.append(el('span', 'more', '+' + (list.length - 6)));
+    count.textContent = list.length <= 1 ? 'Just you here' : list.length + ' here';
+  }
+
+  function setOnline(on) { statusEl.hidden = on; }
+
+  function start() {
+    socket = io();
+
+    socket.on('connect', function () {
+      socket.emit('join', { room: roomId, name: myName, cid: cid });
+    });
+    socket.on('disconnect', function () { joined = false; setOnline(false); });
+
+    socket.on('joined', function (d) { myId = d.you; joined = true; setOnline(true); });
+    socket.on('history', function (msgs) {
+      log.textContent = '';
+      msgs.forEach(addMessage);
+      if (!msgs.length) {
+        log.append(el('div', 'sys hint', "You're the first one here. Tap Invite friends and send them the link."));
+      }
+      scrollDown();
+    });
+    socket.on('message', addMessage);
+    socket.on('system', function (s) { addSystem(s.text); });
+    socket.on('people', renderPeople);
+    socket.on('slow', function () { toast('Slow down a little'); });
+    socket.on('full', function () {
+      addSystem("Can't join this room right now. Open the site again to start a new room.");
+    });
+  }
+
+  $('#joinForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    myName = nick.value.replace(/\s+/g, ' ').trim().slice(0, 20) || randomName();
+    store('ftlo-name', myName);
+    joinScreen.hidden = true;
+    chat.hidden = false;
+    start();
+    msgInput.focus();
+  });
+
+  $('#composer').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var text = msgInput.value.trim();
+    if (!text) return;
+    if (!socket || !joined) { toast('Reconnecting. Try again in a moment.'); return; }
+    socket.emit('message', text);
+    msgInput.value = '';
+    msgInput.focus();
+  });
+
+  $('#invite').addEventListener('click', function () {
+    var url = location.href;
+    if (navigator.share) {
+      navigator.share({ title: 'forthelovedone', text: 'Come chat with me', url: url }).catch(function () {});
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(
+        function () { toast('Link copied. Send it to your friends.'); },
+        function () { window.prompt('Copy this link', url); }
+      );
+    } else {
+      window.prompt('Copy this link', url);
+    }
+  });
+})();
+</script>
+</body>
+</html>
